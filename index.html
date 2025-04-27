@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify - Web Player: Music for Everyone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    body {
+      background-color: #121212;
+      color: white;
+    }
+    .header {
+      position: fixed;
+      width: 100%;
+      z-index: 50;
+      transition: all 0.3s;
+      padding: 1rem 0;
+      background: transparent;
+    }
+    .header.scrolled {
+      background: black;
+      padding: 0.5rem 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-links {
+      display: none;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+      margin-left: 2rem;
+    }
+    .nav-links a:hover {
+      color: #1DB954;
+    }
+    .mobile-menu-btn {
+      display: block;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: black;
+      padding: 1rem 0;
+    }
+    .mobile-menu.active {
+      display: block;
+    }
+    .mobile-menu a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1.5rem;
+      transition: color 0.3s;
+    }
+    .mobile-menu a:hover {
+      color: #1DB954;
+    }
+    .hero {
+      background: linear-gradient(to bottom, #1D1D1D, #121212);
+      padding: 8rem 0 4rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      background: #1DB954;
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 9999px;
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background: #1ed760;
+    }
+    .premium-section {
+      background-image: linear-gradient(to bottom,#1DB954,#1D1D1D);
+      color: black;
+      padding: 4rem 0;
+    }
+    .premium-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .premium-card {
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .premium-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .playlists-section {
+      background: #121212;
+      padding: 4rem 0;
+    }
+    .playlist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .playlist-card {
+      background: #181818;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s;
+    }
+    .playlist-card:hover {
+      background: #282828;
+    }
+    .playlist-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .footer {
+      background: black;
+      padding: 4rem 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    .footer-links h3 {
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    .footer-links a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.75rem;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover {
+      color: #1DB954;
+    }
+    .discovery-section {
+      background: linear-gradient(to bottom, #2D1D5B, #121212);
+      padding: 4rem 0;
+      color: white;
+    }
+    .mood-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+    .mood-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .mood-btn.active {
+      background: #1DB954;
+    }
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .genre-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .genre-card:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .genre-card.selected {
+      background: #1DB954;
+    }
+    .recommendations {
+      margin-top: 3rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s;
+    }
+    .recommendations.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .song-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .song-card img {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.25rem;
+    }
+    .song-info {
+      flex: 1;
+    }
+    .play-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    .play-btn:hover {
+      opacity: 1;
+    }
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+        align-items: center;
+      }
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <div class="logo">
+          <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_White.png" alt="Spotify" style="width: 120px;">
+        </div>
+        <div class="nav-links">
+          <a href="#premium">Premium</a>
+          <a href="#support">Support</a>
+          <a href="#download">Download</a>
+          <span style="margin: 0 1rem; opacity: 0.3;">|</span>
+          <a href="#signup">Sign up</a>
+          <a href="#login">Log in</a>
+        </div>
+        <button class="mobile-menu-btn">
+          <i data-lucide="menu"></i>
+        </button>
+      </nav>
+    </div>
+    <div class="mobile-menu">
+      <a href="#premium">Premium</a>
+      <a href="#support">Support</a>
+      <a href="#download">Download</a>
+      <a href="#signup">Sign up</a>
+      <a href="#login">Log in</a>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Music for everyone.</h1>
+        <p>Millions of songs. No credit card needed.</p>
+        <button class="btn">Get Spotify Free</button>
+      </div>
+    </section>
+    <section class="premium-section">
+      <div class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">Why go Premium?</h2>
+        <div class="premium-features">
+          <div class="premium-card">
+            <div class="icon">🎵</div>
+            <h3>Ad-free music listening</h3>
+            <p>Enjoy uninterrupted music.</p>
+          </div>
+          <div class="premium-card">
+            <div class="icon">📱</div>
+            <h3>Offline playback</h3>
+            <p>Save your data by listening offline.</p>
+          </div>
+          <div class="premium-card">
+            <div class="icon">🔊</div>
+            <h3>Play everywhere</h3>
+            <p>Listen on your speakers, TV, and other devices.</p>
+          </div>
+          <div class="premium-card">
+            <div class="icon">💳</div>
+            <h3>Pay your way</h3>
+            <p>Prepay with PayPal or payment cards.</p>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+          <button class="btn">Get Premium</button>
+        </div>
+      </div>
+    </section>
+    <section class="playlists-section">
+      <div class="container">
+        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">Spotify Playlists</h2>
+        <p style="text-align: center; opacity: 0.7; margin-bottom: 2rem;">Soundtrack your life with the perfect playlists.</p>
+        <div class="playlist-grid">
+          <div class="playlist-card">
+            <img src="https://i.scdn.co/image/ab67616d0000b2738ffc294c1c4362e8472d14cd" alt="Today's Top Hits">
+            <h3>Today's Top Hits</h3>
+            <p style="opacity: 0.7;">Olivia Rodrigo is on top of the Hottest 50!</p>
+          </div>
+          <div class="playlist-card">
+            <img src="https://i.scdn.co/image/ab67616d00001e028b52c6b9bc4e43d873869699" alt="RapCaviar">
+            <h3>RapCaviar</h3>
+            <p style="opacity: 0.7;">New music from Drake, Kendrick Lamar and more.</p>
+          </div>
+          <div class="playlist-card">
+            <img src="https://i.scdn.co/image/ab67706f00000002b0fe40a6e1692822f5a9d8f1" alt="All Out 2010s">
+            <h3>All Out 2010s</h3>
+            <p style="opacity: 0.7;">The biggest songs of the 2010s.</p>
+          </div>
+          <div class="playlist-card">
+            <img src="https://i.scdn.co/image/ab67706f000000029d6165cb544e2b3b6e3d108f" alt="Rock Classics">
+            <h3>Rock Classics</h3>
+            <p style="opacity: 0.7;">Rock legends & epic songs that continue to inspire generations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="discovery-section">
+      <div class="container">
+        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">
+          Discover Your Perfect Music
+        </h2>
+        <p style="text-align: center; opacity: 0.7; margin-bottom: 2rem;">
+          Let us help you find your next favorite song based on your mood and taste
+        </p>
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="happy">😊 Happy</button>
+          <button class="mood-btn" data-mood="chill">😌 Chill</button>
+          <button class="mood-btn" data-mood="energetic">⚡ Energetic</button>
+          <button class="mood-btn" data-mood="focused">🎯 Focused</button>
+          <button class="mood-btn" data-mood="melancholic">🌧️ Melancholic</button>
+        </div>
+        <div class="genre-grid">
+          <div class="genre-card" data-genre="pop">Pop</div>
+          <div class="genre-card" data-genre="rock">Rock</div>
+          <div class="genre-card" data-genre="hiphop">Hip Hop</div>
+          <div class="genre-card" data-genre="electronic">Electronic</div>
+          <div class="genre-card" data-genre="jazz">Jazz</div>
+          <div class="genre-card" data-genre="classical">Classical</div>
+        </div>
+        <div class="recommendations">
+          <h3 style="margin-bottom: 1.5rem;">Recommended for you</h3>
+          <div id="recommendations-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-links">
+          <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_White.png" alt="Spotify" style="width: 120px; margin-bottom: 2rem;">
+        </div>
+        <div class="footer-links">
+          <h3>Company</h3>
+          <a href="#">About</a>
+          <a href="#">Jobs</a>
+          <a href="#">For the Record</a>
+        </div>
+        <div class="footer-links">
+          <h3>Communities</h3>
+          <a href="#">For Artists</a>
+          <a href="#">Developers</a>
+          <a href="#">Advertising</a>
+          <a href="#">Investors</a>
+        </div>
+        <div class="footer-links">
+          <h3>Useful Links</h3>
+          <a href="#">Support</a>
+          <a href="#">Web Player</a>
+          <a href="#">Free Mobile App</a>
+        </div>
+      </div>
+      <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; opacity: 0.7;">
+          <a href="#" style="color: white; text-decoration: none;">Legal</a>
+          <a href="#" style="color: white; text-decoration: none;">Privacy Center</a>
+          <a href="#" style="color: white; text-decoration: none;">Privacy Policy</a>
+          <a href="#" style="color: white; text-decoration: none;">Cookies</a>
+          <a href="#" style="color: white; text-decoration: none;">About Ads</a>
+        </div>
+        <p style="margin-top: 1rem; opacity: 0.7;">© 2024 Spotify AB</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    lucide.createIcons();
+    const header = document.querySelector('.header');
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+      const icon = mobileMenuBtn.querySelector('i');
+      if (mobileMenu.classList.contains('active')) {
+        icon.setAttribute('data-lucide', 'x');
+      } else {
+        icon.setAttribute('data-lucide', 'menu');
+      }
+      lucide.createIcons();
+    });
+    const moodButtons = document.querySelectorAll('.mood-btn');
+    const genreCards = document.querySelectorAll('.genre-card');
+    const recommendationsSection = document.querySelector('.recommendations');
+    const recommendationsList = document.getElementById('recommendations-list');
+    const musicDatabase = {
+      happy: {
+        pop: [
+          { title: "Happy", artist: "Pharrell Williams", cover: "https://i.scdn.co/image/ab67616d0000b273f0f7a6aa77a8e8f9b4470c5c" },
+          { title: "Good as Hell", artist: "Lizzo", cover: "https://i.scdn.co/image/ab67616d0000b273b3d8e3ca9455692ddd69293d" }
+        ],
+        rock: [
+          { title: "Don't Stop Believin'", artist: "Journey", cover: "https://i.scdn.co/image/ab67616d0000b273c5653f9038e42efad2f8a266" },
+          { title: "Walking on Sunshine", artist: "Katrina & The Waves", cover: "https://i.scdn.co/image/ab67616d0000b273d0c97bc9d4d9a3f3d4f12c4b" }
+        ]
+      },
+      chill: {
+        pop: [
+          { title: "Stay With Me", artist: "Sam Smith", cover: "https://i.scdn.co/image/ab67616d0000b273f0e2a82a35962f3c4f6eb73c" },
+          { title: "Watermelon Sugar", artist: "Harry Styles", cover: "https://i.scdn.co/image/ab67616d0000b2734e0362c225863f6ae2432651" }
+        ]
+      }
+    };
+    let currentMood = null;
+    let selectedGenres = new Set();
+    moodButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        moodButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentMood = button.dataset.mood;
+        updateRecommendations();
+      });
+    });
+    genreCards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        const genre = card.dataset.genre;
+        if (selectedGenres.has(genre)) {
+          selectedGenres.delete(genre);
+        } else {
+          selectedGenres.add(genre);
+        }
+        updateRecommendations();
+      });
+    });
+    function updateRecommendations() {
+      if (!currentMood || selectedGenres.size === 0) return;
+      recommendationsSection.classList.add('visible');
+      recommendationsList.innerHTML = '';
+      selectedGenres.forEach(genre => {
+        if (musicDatabase[currentMood]?.[genre]) {
+          musicDatabase[currentMood][genre].forEach(song => {
+            const songCard = document.createElement('div');
+            songCard.className = 'song-card';
+            songCard.innerHTML = `
+              <img src="${song.cover}" alt="${song.title}">
+              <div class="song-info">
+                <h4>${song.title}</h4>
+                <p style="opacity: 0.7">${song.artist}</p>
+              </div>
+              <button class="play-btn">
+                <i data-lucide="play-circle"></i>
+              </button>
+            `;
+            recommendationsList.appendChild(songCard);
+          });
+        }
+      });
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
